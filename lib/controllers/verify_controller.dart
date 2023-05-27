@@ -1,14 +1,13 @@
+import 'package:alt_sms_autofill/alt_sms_autofill.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:get/get.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:syndease/models/sn_user.dart';
-import 'package:syndease/screens/complete_profile.dart';
+import 'package:syndease/screens/verify_success.dart';
 import 'package:syndease/utils/appVars.dart';
 import 'package:syndease/utils/services.dart';
-
-import '../screens/client/home_screen.dart';
-import '../screens/syndic/syndic_home_screen.dart';
 
 class VerifyController extends GetxController {
   TextEditingController pinController = TextEditingController();
@@ -16,20 +15,8 @@ class VerifyController extends GetxController {
   String verificationCode = "";
   String phoneNumber = "";
   RxBool loading = false.obs;
-  var colors = [
-    primaryColor,
-    primaryColor.withOpacity(0.6),
-  ];
-
-  var durations = [
-    5000,
-    4000,
-  ];
-
-  var heightPercentages = [
-    0.29,
-    0.22,
-  ];
+  var smsListerner;
+  String? fcm;
 
   validate() async {
     if (pinController.text.trim().length < 6) {
@@ -52,35 +39,38 @@ class VerifyController extends GetxController {
         UserCredential authResult =
             await FirebaseAuth.instance.signInWithCredential(credential);
         User? user = authResult.user;
-        print(user);
         checkPhoneNumber(user!.uid).then((value) async {
           if (value == "found-in-users") {
             await getUserFromDb(user.uid).then((value) async {
-              print('value.type ${value.toJson()}');
+              value.fcm = fcm!;
               await saveToSession(value);
+              await saveUserToDb(value);
               if (value.type == 0) {
                 await SessionManager().set('progress', 'homeScreen');
-                Get.offAll(() => const HomeScreen(),
+                Get.offAll(() => const VerifySuccess(),
                     transition: Transition.fadeIn,
+                    arguments: "HomeScreen",
                     duration: const Duration(milliseconds: 500));
               } else {
-                Get.offAll(() => const SyndicHomeScreen(),
+                Get.offAll(() => const VerifySuccess(),
                     transition: Transition.fadeIn,
+                    arguments: "SyndicHomeScreen",
                     duration: const Duration(milliseconds: 500));
               }
             });
           } else {
-            Get.snackbar('not found', "not found");
             SnUser snUser = SnUser(
                 uid: user.uid,
                 phoneNumber: user.phoneNumber,
                 fullname: "",
+                fcm: fcm!,
                 type: 0);
             await saveUserToDb(snUser).then((value) async {
               await saveToSession(snUser);
               await SessionManager().set('progress', 'completeProfile');
 
-              Get.offAll(() => const CompleteProfile(),
+              Get.offAll(() => const VerifySuccess(),
+                  arguments: "CompleteProfile",
                   transition: Transition.fadeIn,
                   duration: const Duration(milliseconds: 500));
             });
@@ -99,9 +89,29 @@ class VerifyController extends GetxController {
 
   @override
   Future<void> onInit() async {
+    fcm = await OneSignal.shared.getDeviceState().then((value) async {
+      return value!.userId!;
+    });
     phoneNumber = await SessionManager().get('phone');
-  //  verificationCode = Get.arguments;
+    verificationCode = Get.arguments;
+    try {
+      smsListerner = await AltSmsAutofill().listenForSms.then((value) {
+        pinController.text == ""
+            ? pinController.text =
+                value!.replaceAll(RegExp(r'[^0-9]'), '').substring(0, 6)
+            : null;
+
+        update();
+      });
+    } catch (e) {}
     // TODO: implement onInit
     super.onInit();
+  }
+
+  @override
+  void dispose() {
+    smsListerner.cancel();
+    // TODO: implement dispose
+    super.dispose();
   }
 }

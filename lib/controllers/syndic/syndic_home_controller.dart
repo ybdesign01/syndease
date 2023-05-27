@@ -1,25 +1,31 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:get/get.dart';
+import 'package:syndease/models/report.dart';
 import 'package:syndease/models/sn_user.dart';
-import 'package:syndease/screens/welcome_screen.dart';
 import 'package:syndease/utils/services.dart';
+
+import '../../models/group_report.dart';
 
 class SyndicHomeController extends GetxController {
   SnUser snUser = SnUser();
-  void logout() async {
-    FirebaseAuth.instance.signOut();
-    await SessionManager().destroy();
-    Get.offAll(() => const WelcomeScreen(),
-        transition: Transition.fadeIn,
-        duration: const Duration(milliseconds: 500));
-  }
+  RxBool loading = false.obs;
+
+  List<Report> reports = [];
+  List<Reportgroup> reportgroup = [];
 
   @override
-  void onInit() {
-    getUserFromSession().then((value) {
+  Future<void> onInit() async {
+    loading.toggle();
+    update();
+    await getUserFromSession().then((value) async {
       snUser = value;
-      update();
+      await getSyndicPendingReports(snUser).then((value) async {
+        reports = value;
+        await getGroupReportsSyndic(snUser).then((value) async {
+          reportgroup = value;
+          loading.toggle();
+          update();
+        });
+      });
     });
     super.onInit();
   }

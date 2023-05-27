@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_verification_code/flutter_verification_code.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:syndease/controllers/verify_controller.dart';
-import 'package:syndease/screens/verify_success.dart';
 import 'package:syndease/utils/widgets.dart';
 
 import 'package:get/get.dart';
@@ -39,41 +39,70 @@ class VerifyScreen extends StatelessWidget {
                             children: [logo],
                           ),
                           40.verticalSpace,
-                          GradientText("verifytext",
+                          GradientText(
+                              text: "verifytext",
                               gradient: gradientColor,
                               style: blueTitleTextStyle),
                           10.verticalSpace,
                           Text("entercode", style: textStyle).tr(),
                           70.verticalSpace,
                           Center(
-                            child: VerificationCode(
-                              underlineWidth: 2.w,
-                              itemSize: 50.w,
-                              underlineUnfocusedColor: darkColor,
-                              textStyle: const TextStyle(
-                                  fontSize: 20.0, color: darkColor),
-                              keyboardType: TextInputType.phone,
-                              underlineColor:
-                                  primaryColor, // If this is null it will use primaryColor: Colors.red from Theme
-                              length: 6,
-                              cursorColor: Colors.white,
-                              onCompleted: (String value) {
-                                controller.pinController.text = value;
-                              },
-                              onEditing: (bool
-                                  value) {}, // If this is null it will default to the ambient
-                              // clearAll is NOT required, you can delete it
-                              // takes any widget, so you can implement your design
+                             
+                              child: Center(
+                                  child: PinCodeTextField(
+                            cursorColor: darkColor,
+                            backgroundColor: Colors.transparent,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(6),
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            length: 6,
+                            obscureText: false,
+                            animationType: AnimationType.fade,
+                            textStyle: TextStyle(
+                                color: darkColor,
+                                fontSize: 24.sp,
+                                fontWeight: FontWeight.bold),
+                            pinTheme: PinTheme(
+                              disabledColor: Colors.transparent,
+                              inactiveFillColor: Colors.transparent,
+                              selectedColor: darkColor,
+                              selectedFillColor: Colors.transparent,
+                              errorBorderColor: Colors.transparent,
+                              activeColor: darkColor,
+                              inactiveColor: darkColor,
+                              shape: PinCodeFieldShape.underline,
+                              fieldHeight: 60,
+                              fieldWidth: 40,
+                              activeFillColor: Colors.transparent,
                             ),
-                          ),
+                            animationDuration:
+                                const Duration(milliseconds: 300),
+                            enableActiveFill: true,
+                            // errorAnimationController: errorController,
+                            controller: controller.pinController,
+                            onCompleted: (v) {
+                              // controller.allowed = true;
+                              controller.pinController.text = v;
+                              controller.update();
+                            },
+                            onChanged: (value) {
+                              // controller.allowed = false;
+                              controller.update();
+                            },
+
+                            beforeTextPaste: (text) {
+                              //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
+                              //but you can show anything you want here, like your pop up saying wrong paste format or etc
+                              return true;
+                            },
+                            appContext: context,
+                          ))),
                           80.verticalSpace,
                           SecondaryButton(
+                            loading: controller.loading.value,
                             text: "verifynumber",
-                            onpress: () => {
-                              Get.offAll(() => const VerifySuccess(),
-                                  transition: Transition.fadeIn,
-                                  duration: const Duration(milliseconds: 500))
-                            },
+                            onpress: () => {controller.submit()},
                           ),
                           80.verticalSpace,
                         ]),

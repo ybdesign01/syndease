@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:syndease/utils/appVars.dart';
 import 'package:syndease/utils/widgets.dart';
-import '../controllers/verify_controller.dart';
 import '../controllers/verify_success_controller.dart';
 
 class VerifySuccess extends StatelessWidget {
@@ -37,7 +36,8 @@ class VerifySuccess extends StatelessWidget {
                             children: [logo],
                           ),
                           40.verticalSpace,
-                          GradientText("success",
+                          GradientText(
+                              text: "success",
                               gradient: gradientColor,
                               style: blueTitleTextStyle),
                           10.verticalSpace,
@@ -46,8 +46,8 @@ class VerifySuccess extends StatelessWidget {
                           Center(child: successImage),
                           80.verticalSpace,
                           SecondaryButton(
-                              text: "continue",
-                              onpress: () => {}),
+                              text: "continue (${controller.current})",
+                              onpress: () => {controller.submit()}),
                         ]),
                   ),
                 ),

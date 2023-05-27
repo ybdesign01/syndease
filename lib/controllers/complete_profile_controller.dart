@@ -9,32 +9,24 @@ import '../utils/appVars.dart';
 
 class CompleteProfileController extends GetxController {
   var backgroundColor = Colors.transparent;
-  var colors = [
-    primaryColor,
-    primaryColor.withOpacity(0.6),
-  ];
-
-  var durations = [
-    5000,
-    4000,
-  ];
-
-  var heightPercentages = [
-    0.29,
-    0.22,
-  ];
 
   RxBool loading = false.obs;
   SnUser snUser = SnUser();
-  TextEditingController fullNameController = TextEditingController();
+  TextEditingController firstnameController = TextEditingController();
+  TextEditingController lastnameController = TextEditingController();
 
   verify() async {
-    if (fullNameController.text.trim().length < 3) {
-      Get.snackbar("Error", "Enter a valid name",
+    if (firstnameController.text.trim().length < 3) {
+      Get.snackbar("Error", "Enter a valid first name",
           colorText: Colors.white, backgroundColor: dangerColor);
       return false;
+    } else if (lastnameController.text.trim().length < 3) {
+      Get.snackbar("Error", "Enter a valid last name",
+          colorText: Colors.white, backgroundColor: dangerColor);
+      return false;
+    } else {
+      return true;
     }
-    return true;
   }
 
   submit() {
@@ -42,13 +34,14 @@ class CompleteProfileController extends GetxController {
       if (value) {
         loading.toggle();
         update();
-        snUser.fullname = fullNameController.text.trim();
+        snUser.fullname =
+            "${firstnameController.text.trim().toLowerCase()} ${lastnameController.text.trim().toLowerCase()}";
         await saveUserToDb(snUser).then((value) async {
           await SessionManager().set('progress', 'homeScreen');
           saveToSession(snUser);
           Get.snackbar("Success", "User saved",
               colorText: Colors.green, backgroundColor: successColor);
-          Get.to(() => const HomeScreen(),
+          Get.offAll(() => const HomeScreen(),
               transition: Transition.fadeIn,
               duration: const Duration(milliseconds: 500));
           loading.toggle();
@@ -62,7 +55,7 @@ class CompleteProfileController extends GetxController {
   void onInit() {
     getUserFromSession().then((value) {
       snUser = value;
-      print(snUser);
+ 
     });
     // TODO: implement onInit
     super.onInit();

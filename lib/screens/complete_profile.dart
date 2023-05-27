@@ -1,11 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconly/iconly.dart';
-import 'package:syndease/screens/client/home_screen.dart';
 import 'package:syndease/utils/widgets.dart';
-import 'package:wave/config.dart';
-import 'package:wave/wave.dart';
 
 import 'package:get/get.dart';
 
@@ -42,26 +38,33 @@ class CompleteProfile extends StatelessWidget {
                             children: [logo],
                           ),
                           40.verticalSpace,
-                          GradientText("completeprofile",
+                          GradientText(text:"completeprofile",
                               gradient: gradientColor,
                               style: blueTitleTextStyle),
                           10.verticalSpace,
                           Text("plscomplete", style: textStyle).tr(),
                           70.verticalSpace,
-                          PrimaryTextField(hintText: "plsenteryourname",centered: false, label: "firstname",),
+                          PrimaryTextField(
+                            controller: controller.firstnameController,
+                            hintText: "plsenteryourname",
+                            centered: false,
+                            label: "firstname",
+                          ),
                           30.verticalSpace,
-                          PrimaryTextField(hintText: "plsenteryourlastname",centered: false, label: "lastname",),
+                          PrimaryTextField(
+                            controller: controller.lastnameController,
+                            hintText: "plsenteryourlastname",
+                            centered: false,
+                            label: "lastname",
+                          ),
                           80.verticalSpace,
                           SecondaryButton(
+                            loading: controller.loading.value,
                             text: "save",
-                            onpress: () => {
-                              Get.offAll(() => const HomeScreen(),
-                                  transition: Transition.fadeIn,
-                                  duration: const Duration(milliseconds: 500))
-                            },
-                          ),          
+                            onpress: () => {controller.submit()},
+                          ),
                           20.verticalSpace,
-                          ]),
+                        ]),
                   ),
                 ),
               ), /* add child content here */

@@ -21,6 +21,7 @@ void main() async {
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   await handlerPermission();
+  await initOneSignal();
   Widget? main;
   await initWidget().then(
     (value) {

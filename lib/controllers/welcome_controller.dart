@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:get/get.dart';
 import 'package:syndease/utils/appVars.dart';
+import 'package:syndease/utils/services.dart';
 
 import '../screens/verify_screen.dart';
 
@@ -13,23 +14,6 @@ class WelcomeController extends GetxController {
   int range = 9;
   RxBool loading = false.obs;
 
-  var backgroundColor = Colors.transparent;
-
-  var colors = [
-    primaryColor,
-    primaryColor.withOpacity(0.6),
-  ];
-
-  var durations = [
-    5000,
-    4000,
-  ];
-
-  var heightPercentages = [
-    0.29,
-    0.22,
-  ];
-
   verifyPhone() async {
     if (phoneController.text.length < range) {
       Get.snackbar(tr('error'), tr('entervalidnumber'),
@@ -38,6 +22,12 @@ class WelcomeController extends GetxController {
     } else {
       return true;
     }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    initOneSignal();
   }
 
   submit() {
@@ -51,7 +41,6 @@ class WelcomeController extends GetxController {
           verificationFailed: (FirebaseAuthException e) async {
             loading.toggle();
             update();
-            print('${e.message}');
             Get.snackbar(tr('error'), e.message!,
                 colorText: Colors.white, backgroundColor: dangerColor);
           },
@@ -68,6 +57,9 @@ class WelcomeController extends GetxController {
           },
           codeAutoRetrievalTimeout: (verificationId) async {},
         );
+      } else {
+        loading.toggle();
+        update();
       }
     });
   }

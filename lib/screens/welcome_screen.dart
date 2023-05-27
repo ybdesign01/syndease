@@ -7,7 +7,6 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:syndease/controllers/welcome_controller.dart';
 
 import 'package:get/get.dart';
-import 'package:syndease/screens/verify_screen.dart';
 import 'package:syndease/utils/appVars.dart';
 import 'package:syndease/utils/widgets.dart';
 
@@ -38,83 +37,70 @@ class WelcomeScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          logoWhite
-                        ],
+                        children: [logoWhite],
                       ),
-                      70.verticalSpace, 
+                      70.verticalSpace,
                       Text("welcometext", style: titleTextStyle).tr(),
                       30.verticalSpace,
-                     IntlPhoneField(
-                    
-                                        onCountryChanged: (value) {
-                                          controller.phoneController.text =
-                                              value.dialCode;
-                                          controller.range = value.maxLength;
-                                          controller.phoneController.clear();
-                                          controller.update();
-                                        },
-                                        inputFormatters: [
-                                          LengthLimitingTextInputFormatter(
-                                              controller.range),
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        controller: controller.phoneController,
-                                        key: super.key,
-                                        dropdownTextStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 17.sp,
-                                            fontWeight: FontWeight.bold),
-                                          
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 17.sp,
-                                            fontWeight: FontWeight.bold),
-                                        textAlignVertical:
-                                            TextAlignVertical.center,
-                                        decoration: InputDecoration(
-                                          suffixIcon: Icon(
-                                            IconlyLight.call,
-                                            color: Colors.white,
-                                          ),
-                                          hintStyle: TextStyle(
-                                            fontSize: 21.sp,
-                                            color: Colors.white,
-                                          ),
-                                          filled: true,
-                                          fillColor: Colors.white.withOpacity(0.5),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5.r),
-                                            borderSide: const BorderSide(
-                                                color: Colors.white),
-                                          ),
-                                          disabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5.r),
-                                            borderSide: const BorderSide(
-                                                color: Colors.white),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5.r),
-                                            borderSide: const BorderSide(
-                                                color: Colors.white, width: 1),
-                                          ),
-                                        ),
-                                        initialCountryCode: 'MA',
-                                        invalidNumberMessage: '',
-                                      ),
+                      IntlPhoneField(
+                        onCountryChanged: (value) {
+                          controller.phoneController.text = value.dialCode;
+                          controller.range = value.maxLength;
+                          controller.phoneController.clear();
+                          controller.update();
+                        },
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(controller.range),
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        controller: controller.phoneController,
+                        key: super.key,
+                        dropdownTextStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold),
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          suffixIcon: const Icon(
+                            IconlyLight.call,
+                            color: Colors.white,
+                          ),
+                          hintStyle: TextStyle(
+                            fontSize: 21.sp,
+                            color: Colors.white,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.5),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.r),
+                            borderSide: const BorderSide(color: Colors.white),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.r),
+                            borderSide: const BorderSide(color: Colors.white),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.r),
+                            borderSide:
+                                const BorderSide(color: Colors.white, width: 1),
+                          ),
+                        ),
+                        initialCountryCode: 'MA',
+                        invalidNumberMessage: '',
+                      ),
                       30.verticalSpace,
-                      PrimaryButton(text: "login", onpress: ()=>{  Get.offAll(() => const VerifyScreen(),
-                                  transition: Transition.fadeIn,
-                                  duration: const Duration(milliseconds: 500))
-                            })
+                      PrimaryButton(
+                          loading: controller.loading.value,
+                          text: "login",
+                          onpress: () => {controller.submit()})
                     ]),
               ), /* add child content here */
             ),
           );
         });
   }
-} 
+}
