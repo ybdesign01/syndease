@@ -12,7 +12,7 @@ class SnUser {
   String? uid;
   String? fullname;
   String? phoneNumber;
-  int? type;
+  int? type;  
   String? latitude;
   String? longitude;
   String? fcm;
@@ -20,7 +20,7 @@ class SnUser {
     this.uid,
     this.fullname,
     this.phoneNumber,
-    this.type,
+    this.type = 0,
     this.longitude,
     this.latitude,
     this.fcm,
@@ -30,7 +30,7 @@ class SnUser {
         uid: json["uid"],
         fullname: json["fullname"],
         phoneNumber: json["phone_number"],
-        type: json["type"],
+        type: json["type"] ?? 0,
         latitude: json["latitude"].toString(),
         longitude: json["longitude"].toString(),
         fcm: json["fcm"],
@@ -40,7 +40,7 @@ class SnUser {
         "uid": uid,
         "fullname": fullname,
         "phone_number": phoneNumber,
-        "type": type,
+        "type": type ?? 0,
         "latitude": latitude,
         "longitude": longitude,
         "fcm": fcm,

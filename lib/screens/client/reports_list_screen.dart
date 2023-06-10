@@ -159,7 +159,7 @@ class ReportsListScreen extends StatelessWidget {
                               controller: controller.categoryController,
                             ),
                             16.verticalSpace,
-                            SizedBox(
+                            SizedBox(   
                               height: 1.sh - 289.h,
                               width: 1.sw,
                               child: ListView.builder(

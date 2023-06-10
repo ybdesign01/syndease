@@ -64,11 +64,11 @@ class NewReportController extends GetxController {
   }
 
   submit() async {
-    await verify().then((value) {
+    await verify().then((value)async {
       if (value) {
         loading.toggle();
         update();
-        FirebaseStorage.instance
+      await  FirebaseStorage.instance
             .ref('report-images/${file!.name}')
             .putFile(image!)
             .then((p0) {
@@ -78,7 +78,7 @@ class NewReportController extends GetxController {
             report.description = descriptionController.text.trim();
             report.category = categoryController.text.trim();
             report.status = "pending";
-
+ 
             report.creationDate = DateTime.now().toString();
             await FirebaseFirestore.instance
                 .collection('reports')
